@@ -1,0 +1,603 @@
+{
+  "schema": "vps3xui/manifest-schema-lite/v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "manifest_id",
+    "approved",
+    "source",
+    "compose_projects",
+    "containers",
+    "volumes",
+    "bind_trees",
+    "writable_layers",
+    "reference_artifacts",
+    "metadata_artifacts",
+    "trusted_files",
+    "exclusions",
+    "images",
+    "certbot",
+    "ufw"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "integer",
+      "enum": [
+        1
+      ]
+    },
+    "manifest_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9._-]{1,64}$"
+    },
+    "approved": {
+      "type": "boolean"
+    },
+    "approval_note": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "maxLength": 400
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ssh_alias",
+        "expected_machine_id",
+        "expected_host_key_fingerprint"
+      ],
+      "properties": {
+        "ssh_alias": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9._-]{1,64}$"
+        },
+        "expected_machine_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[0-9a-fA-F-]{8,64}$"
+        },
+        "expected_host_key_fingerprint": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^SHA256:[A-Za-z0-9+/=]{8,}$"
+        }
+      }
+    },
+    "compose_projects": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "project",
+          "working_dir",
+          "files",
+          "services"
+        ],
+        "properties": {
+          "project": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$"
+          },
+          "working_dir": {
+            "type": "string",
+            "pattern": "^/"
+          },
+          "files": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1
+          },
+          "services": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1
+          }
+        }
+      }
+    },
+    "containers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "compose_project",
+          "service",
+          "expected_state",
+          "included",
+          "restart_order",
+          "image"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$"
+          },
+          "compose_project": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$"
+          },
+          "service": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$"
+          },
+          "expected_state": {
+            "type": "string",
+            "enum": [
+              "running",
+              "exited"
+            ]
+          },
+          "included": {
+            "type": "boolean"
+          },
+          "restart_order": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 1000
+          },
+          "image": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "reference",
+              "repo_digest",
+              "source",
+              "restorable"
+            ],
+            "properties": {
+              "reference": {
+                "type": "string",
+                "maxLength": 300
+              },
+              "repo_digest": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "pattern": "^[A-Za-z0-9._/@:-]+@sha256:[0-9a-f]{64}$"
+              },
+              "source": {
+                "type": "string",
+                "enum": [
+                  "registry",
+                  "local_build"
+                ]
+              },
+              "restorable": {
+                "type": "boolean"
+              }
+            }
+          },
+          "mounts": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "type",
+                "source",
+                "destination",
+                "rw"
+              ],
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "bind",
+                    "volume"
+                  ]
+                },
+                "name": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "source": {
+                  "type": "string",
+                  "pattern": "^/"
+                },
+                "destination": {
+                  "type": "string",
+                  "pattern": "^/"
+                },
+                "rw": {
+                  "type": "boolean"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "volumes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "driver",
+          "options",
+          "artifact",
+          "sensitive"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$"
+          },
+          "driver": {
+            "type": "string",
+            "enum": [
+              "local"
+            ]
+          },
+          "options": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "artifact": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.tar$"
+          },
+          "sensitive": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "bind_trees": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "artifact",
+          "root",
+          "includes",
+          "sensitive"
+        ],
+        "properties": {
+          "artifact": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.tar$"
+          },
+          "root": {
+            "type": "string",
+            "pattern": "^/"
+          },
+          "includes": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "sensitive": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "writable_layers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "container",
+          "path",
+          "artifact",
+          "sensitive"
+        ],
+        "properties": {
+          "container": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$"
+          },
+          "path": {
+            "type": "string",
+            "pattern": "^/"
+          },
+          "artifact": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.tar$"
+          },
+          "sensitive": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "reference_artifacts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "artifacts",
+          "source",
+          "note",
+          "never_apply"
+        ],
+        "properties": {
+          "artifacts": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}(\\.[A-Za-z0-9._-]{1,16})?$"
+            }
+          },
+          "source": {
+            "type": "string",
+            "pattern": "^/"
+          },
+          "note": {
+            "type": "string",
+            "maxLength": 400
+          },
+          "never_apply": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "metadata_artifacts": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.json$"
+      },
+      "minItems": 1
+    },
+    "trusted_files": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "path",
+          "sha256"
+        ],
+        "properties": {
+          "path": {
+            "type": "string",
+            "pattern": "^/"
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "mode": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^0[0-7]{3}$"
+          },
+          "uid": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "gid": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0
+          }
+        }
+      }
+    },
+    "pending_approval": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "resource",
+          "kind",
+          "reason"
+        ],
+        "properties": {
+          "resource": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "container",
+              "volume",
+              "mount",
+              "service"
+            ]
+          },
+          "reason": {
+            "type": "string",
+            "maxLength": 400
+          }
+        }
+      }
+    },
+    "exclusions": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "images": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "archive_images",
+        "policy"
+      ],
+      "properties": {
+        "archive_images": {
+          "type": "boolean",
+          "enum": [
+            false
+          ]
+        },
+        "policy": {
+          "type": "string",
+          "maxLength": 400
+        }
+      }
+    },
+    "certbot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "lineage",
+        "guard_path",
+        "guard_enabled_path",
+        "cleanup_service",
+        "cleanup_timer",
+        "dropin",
+        "service_unit",
+        "timer_unit",
+        "lease_path",
+        "artifact",
+        "max_lease_seconds",
+        "cleanup_interval_seconds",
+        "permitted_hooks"
+      ],
+      "properties": {
+        "lineage": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9._-]{1,128}$"
+        },
+        "guard_path": {
+          "type": "string",
+          "pattern": "^/"
+        },
+        "guard_enabled_path": {
+          "type": "string",
+          "pattern": "^/"
+        },
+        "cleanup_service": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9@._-]{1,128}\\.service$"
+        },
+        "cleanup_timer": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9@._-]{1,128}\\.timer$"
+        },
+        "dropin": {
+          "type": "string",
+          "pattern": "^/"
+        },
+        "service_unit": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9@._-]{1,128}\\.service$"
+        },
+        "timer_unit": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9@._-]{1,128}\\.timer$"
+        },
+        "lease_path": {
+          "type": "string",
+          "pattern": "^/"
+        },
+        "artifact": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}\\.tar$"
+        },
+        "max_lease_seconds": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 86400
+        },
+        "cleanup_interval_seconds": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 3600
+        },
+        "permitted_hooks": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "enum": [
+              "pre_hook",
+              "post_hook",
+              "renew_hook",
+              "deploy_hook"
+            ]
+          }
+        },
+        "hook_fingerprints": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          }
+        },
+        "renewal_hook_dirs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^/"
+          }
+        }
+      }
+    },
+    "ufw": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "reference_only",
+        "paths",
+        "never_apply"
+      ],
+      "properties": {
+        "reference_only": {
+          "type": "boolean",
+          "enum": [
+            true
+          ]
+        },
+        "paths": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "pattern": "^/"
+          }
+        },
+        "never_apply": {
+          "type": "boolean",
+          "enum": [
+            true
+          ]
+        }
+      }
+    }
+  }
+}

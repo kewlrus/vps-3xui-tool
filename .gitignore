@@ -1,0 +1,14 @@
+# Python bytecode and caches
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Local machine state, runtime state and plans produced by the vps3xui tool.
+# (Design §3: local machine configs, runtime state and backups stay out of git.)
+.vps3xui/
+state/
+backups/
+local-state/
+*.plan.json
+plan.json
+local-manifest*.json

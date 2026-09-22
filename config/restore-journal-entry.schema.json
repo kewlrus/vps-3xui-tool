@@ -1,0 +1,110 @@
+{
+  "schema": "vps3xui/restore-journal-entry/v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "job_id",
+    "seq",
+    "step_id",
+    "stage",
+    "phase",
+    "kind",
+    "resource",
+    "ownership",
+    "expected",
+    "recorded_at"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "integer",
+      "enum": [
+        1
+      ]
+    },
+    "job_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$"
+    },
+    "seq": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "step_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][A-Za-z0-9._:-]{0,127}$"
+    },
+    "stage": {
+      "type": "string",
+      "enum": [
+        "prepare",
+        "stage",
+        "activate",
+        "verify",
+        "certbot_activate"
+      ]
+    },
+    "phase": {
+      "type": "string",
+      "enum": [
+        "intent",
+        "outcome"
+      ]
+    },
+    "kind": {
+      "type": "string",
+      "enum": [
+        "package",
+        "service_unit",
+        "directory",
+        "file_tree",
+        "volume",
+        "image",
+        "container",
+        "writable_layer",
+        "certbot_automation",
+        "payload"
+      ]
+    },
+    "resource": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "ownership": {
+      "type": "string",
+      "enum": [
+        "created_by_job",
+        "preexisting_accepted"
+      ]
+    },
+    "expected": {
+      "type": "object"
+    },
+    "observed": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "outcome": {
+      "type": "string",
+      "enum": [
+        "applied",
+        "not_applied",
+        "failed",
+        "unknown"
+      ]
+    },
+    "error": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "recorded_at": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$"
+    }
+  }
+}

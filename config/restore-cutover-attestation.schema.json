@@ -1,0 +1,76 @@
+{
+  "schema": "vps3xui/restore-cutover-attestation/v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "kind",
+    "job_id",
+    "plan_identity",
+    "attested_at",
+    "operator_decision",
+    "independent_control_channel"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "integer",
+      "enum": [
+        1
+      ]
+    },
+    "kind": {
+      "type": "string",
+      "enum": [
+        "vps3xui.restore.cutover_attestation"
+      ]
+    },
+    "job_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$"
+    },
+    "plan_identity": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "attested_at": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$"
+    },
+    "operator_decision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "cutover_permitted",
+        "statement"
+      ],
+      "properties": {
+        "cutover_permitted": {
+          "type": "boolean"
+        },
+        "statement": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 400
+        }
+      }
+    },
+    "independent_control_channel": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "confirmed",
+        "description"
+      ],
+      "properties": {
+        "confirmed": {
+          "type": "boolean"
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 400
+        }
+      }
+    }
+  }
+}

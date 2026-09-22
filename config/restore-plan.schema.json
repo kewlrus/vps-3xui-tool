@@ -1,0 +1,391 @@
+{
+  "schema": "vps3xui/restore-plan/v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "command",
+    "role",
+    "created_at",
+    "expires_at",
+    "tool_version",
+    "job_id",
+    "manifest",
+    "backup",
+    "source",
+    "target",
+    "target_facts_digest",
+    "resources",
+    "operations",
+    "conflicts",
+    "deferred_checks",
+    "space",
+    "activation_boundary",
+    "input_digest",
+    "identity"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "integer",
+      "enum": [
+        1
+      ]
+    },
+    "command": {
+      "type": "string",
+      "enum": [
+        "restore.plan"
+      ]
+    },
+    "role": {
+      "type": "string",
+      "enum": [
+        "target"
+      ]
+    },
+    "created_at": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$"
+    },
+    "expires_at": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$"
+    },
+    "tool_version": {
+      "type": "string",
+      "maxLength": 64
+    },
+    "job_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$"
+    },
+    "manifest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "manifest_id",
+        "digest"
+      ],
+      "properties": {
+        "manifest_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9._-]{1,64}$"
+        },
+        "digest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "backup": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "backup_id",
+        "backup_digest",
+        "format_version",
+        "manifest_id",
+        "manifest_digest",
+        "tool_version",
+        "created_at",
+        "source_arch",
+        "required_artifacts",
+        "reference_only_artifacts"
+      ],
+      "properties": {
+        "backup_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$"
+        },
+        "backup_digest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "format_version": {
+          "type": "integer",
+          "enum": [
+            1
+          ]
+        },
+        "manifest_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9._-]{1,64}$"
+        },
+        "manifest_digest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "tool_version": {
+          "type": "string",
+          "maxLength": 64
+        },
+        "created_at": {
+          "type": "string",
+          "maxLength": 40
+        },
+        "source_arch": {
+          "type": "string",
+          "maxLength": 32
+        },
+        "required_artifacts": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "maxLength": 128
+          },
+          "uniqueItems": true
+        },
+        "reference_only_artifacts": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "maxLength": 128
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ssh_alias",
+        "host_key_fingerprint",
+        "machine_id",
+        "provenance"
+      ],
+      "properties": {
+        "ssh_alias": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$"
+        },
+        "host_key_fingerprint": {
+          "type": "string",
+          "pattern": "^SHA256:[A-Za-z0-9+/=]{8,128}$"
+        },
+        "machine_id": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{32}$"
+        },
+        "provenance": {
+          "type": "string",
+          "enum": [
+            "backup_metadata",
+            "manifest_pins",
+            "source_record"
+          ]
+        }
+      }
+    },
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ssh_alias",
+        "host_key_fingerprint",
+        "machine_id",
+        "resolved",
+        "os_id",
+        "os_version",
+        "arch",
+        "platform_id"
+      ],
+      "properties": {
+        "ssh_alias": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$"
+        },
+        "host_key_fingerprint": {
+          "type": "string",
+          "pattern": "^SHA256:[A-Za-z0-9+/=]{8,128}$"
+        },
+        "machine_id": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{32}$"
+        },
+        "resolved": {
+          "type": "object"
+        },
+        "os_id": {
+          "type": "string",
+          "maxLength": 32
+        },
+        "os_version": {
+          "type": "string",
+          "maxLength": 32
+        },
+        "arch": {
+          "type": "string",
+          "maxLength": 32
+        },
+        "platform_id": {
+          "type": "string",
+          "maxLength": 64
+        }
+      }
+    },
+    "target_facts_digest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "resources": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "bind_trees",
+        "volumes",
+        "containers",
+        "images",
+        "writable_layers",
+        "reference_only_artifacts"
+      ],
+      "properties": {
+        "bind_trees": {
+          "type": "array"
+        },
+        "volumes": {
+          "type": "array"
+        },
+        "containers": {
+          "type": "array"
+        },
+        "images": {
+          "type": "array"
+        },
+        "writable_layers": {
+          "type": "array"
+        },
+        "reference_only_artifacts": {
+          "type": "array"
+        }
+      }
+    },
+    "operations": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "prepare",
+        "stage",
+        "activate",
+        "certbot_activate"
+      ],
+      "properties": {
+        "prepare": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "maxLength": 200
+          }
+        },
+        "stage": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "maxLength": 200
+          }
+        },
+        "activate": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "maxLength": 200
+          }
+        },
+        "certbot_activate": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "maxLength": 200
+          }
+        }
+      }
+    },
+    "conflicts": {
+      "type": "array",
+      "maxItems": 0
+    },
+    "deferred_checks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "check",
+          "before_stage",
+          "reason"
+        ],
+        "properties": {
+          "check": {
+            "type": "string",
+            "maxLength": 80
+          },
+          "before_stage": {
+            "type": "string",
+            "enum": [
+              "prepare",
+              "stage",
+              "activate",
+              "certbot_activate"
+            ]
+          },
+          "reason": {
+            "type": "string",
+            "maxLength": 200
+          }
+        }
+      }
+    },
+    "space": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "required_bytes",
+        "free_bytes"
+      ],
+      "properties": {
+        "required_bytes": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "free_bytes": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "activation_boundary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "requires_cutover_evidence",
+        "max_evidence_age_seconds",
+        "automatic_source_actions"
+      ],
+      "properties": {
+        "requires_cutover_evidence": {
+          "type": "boolean",
+          "enum": [
+            true
+          ]
+        },
+        "max_evidence_age_seconds": {
+          "type": "integer",
+          "minimum": 60,
+          "maximum": 900
+        },
+        "automatic_source_actions": {
+          "type": "array",
+          "maxItems": 0
+        }
+      }
+    },
+    "input_digest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "identity": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    }
+  }
+}

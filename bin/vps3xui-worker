@@ -1,0 +1,5 @@
+#!/bin/sh
+set -eu
+root=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+export VPS3XUI_RELEASE_DIR="${VPS3XUI_RELEASE_DIR:-$root}"
+exec env PYTHONPATH="$root" python3 -m vps3xui.worker.backup_worker "$@"

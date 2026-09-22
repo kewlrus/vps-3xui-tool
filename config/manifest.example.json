@@ -1,0 +1,272 @@
+{
+  "schema_version": 1,
+  "manifest_id": "vps3xui-snapshot-20260920",
+  "approved": false,
+  "approval_note": "Documented 2026-09-20 snapshot. NOT approved for the current live inventory: agent-relay has not been verified and this file must be updated from a fresh read-only inspect before any apply.",
+  "source": {
+    "ssh_alias": "vps-3xui",
+    "expected_machine_id": null,
+    "expected_host_key_fingerprint": null
+  },
+  "compose_projects": [
+    {
+      "project": "llmproxy",
+      "working_dir": "/opt/llmproxy",
+      "files": [
+        "/opt/llmproxy/docker-compose.yaml"
+      ],
+      "services": [
+        "litellm",
+        "caddy"
+      ]
+    },
+    {
+      "project": "panel",
+      "working_dir": "/root/panel",
+      "files": [
+        "/root/panel/compose.yml"
+      ],
+      "services": [
+        "3xui"
+      ]
+    }
+  ],
+  "containers": [
+    {
+      "name": "litellm",
+      "compose_project": "llmproxy",
+      "service": "litellm",
+      "expected_state": "running",
+      "included": true,
+      "restart_order": 10,
+      "image": {
+        "reference": "ghcr.io/berriai/litellm:1.101.0",
+        "repo_digest": "ghcr.io/berriai/litellm@sha256:32c04b00bc1a720e6d5eeb56a7e72f4e1e7d1e538e779c59b990cbddfd5e27da",
+        "source": "registry",
+        "restorable": true
+      },
+      "mounts": [
+        {
+          "type": "bind",
+          "name": null,
+          "source": "/opt/llmproxy/litellm-config.yaml",
+          "destination": "/app/config.yaml",
+          "rw": false
+        },
+        {
+          "type": "volume",
+          "name": "llmproxy_chatgpt_auth",
+          "source": "/var/lib/docker/volumes/llmproxy_chatgpt_auth/_data",
+          "destination": "/var/lib/litellm/chatgpt",
+          "rw": true
+        }
+      ]
+    },
+    {
+      "name": "caddy",
+      "compose_project": "llmproxy",
+      "service": "caddy",
+      "expected_state": "running",
+      "included": true,
+      "restart_order": 20,
+      "image": {
+        "reference": "caddy:2",
+        "repo_digest": "caddy@sha256:df7f1c2fb114453b951de51a98efc010db1655a92c2e86be6706714e2417a78d",
+        "source": "registry",
+        "restorable": true
+      },
+      "mounts": [
+        {
+          "type": "bind",
+          "name": null,
+          "source": "/opt/llmproxy/caddy/Caddyfile",
+          "destination": "/etc/caddy/Caddyfile",
+          "rw": false
+        },
+        {
+          "type": "volume",
+          "name": "llmproxy_caddy_data",
+          "source": "/var/lib/docker/volumes/llmproxy_caddy_data/_data",
+          "destination": "/data",
+          "rw": true
+        },
+        {
+          "type": "volume",
+          "name": "llmproxy_caddy_config",
+          "source": "/var/lib/docker/volumes/llmproxy_caddy_config/_data",
+          "destination": "/config",
+          "rw": true
+        }
+      ]
+    },
+    {
+      "name": "3xui_app",
+      "compose_project": "panel",
+      "service": "3xui",
+      "expected_state": "running",
+      "included": true,
+      "restart_order": 30,
+      "image": {
+        "reference": "ghcr.io/mhsanaei/3x-ui:v3.7.0",
+        "repo_digest": "ghcr.io/mhsanaei/3x-ui@sha256:3b3131f1876e6bf35063a9ec4dd1c594e4525180bfc2e1c477dcc8a3c9550ca1",
+        "source": "registry",
+        "restorable": true
+      },
+      "mounts": [
+        {
+          "type": "bind",
+          "name": null,
+          "source": "/root/panel/db",
+          "destination": "/etc/x-ui",
+          "rw": true
+        },
+        {
+          "type": "bind",
+          "name": null,
+          "source": "/etc/letsencrypt",
+          "destination": "/etc/letsencrypt",
+          "rw": false
+        }
+      ]
+    },
+    {
+      "name": "telemt",
+      "compose_project": "telemt",
+      "service": "telemt",
+      "expected_state": "exited",
+      "included": false,
+      "restart_order": 900,
+      "image": {
+        "reference": "unknown/telemt",
+        "repo_digest": null,
+        "source": "local_build",
+        "restorable": false
+      },
+      "mounts": []
+    }
+  ],
+  "volumes": [
+    {
+      "name": "llmproxy_chatgpt_auth",
+      "driver": "local",
+      "options": {},
+      "artifact": "llmproxy_chatgpt_auth.tar",
+      "sensitive": true
+    },
+    {
+      "name": "llmproxy_caddy_data",
+      "driver": "local",
+      "options": {},
+      "artifact": "llmproxy_caddy_data.tar",
+      "sensitive": true
+    },
+    {
+      "name": "llmproxy_caddy_config",
+      "driver": "local",
+      "options": {},
+      "artifact": "llmproxy_caddy_config.tar",
+      "sensitive": false
+    }
+  ],
+  "bind_trees": [
+    {
+      "artifact": "binds.tar",
+      "root": "/",
+      "includes": [
+        "opt/llmproxy/docker-compose.yaml",
+        "opt/llmproxy/litellm-config.yaml",
+        "opt/llmproxy/.env",
+        "opt/llmproxy/caddy/Caddyfile",
+        "root/panel/compose.yml",
+        "root/panel/db",
+        "etc/letsencrypt"
+      ],
+      "sensitive": true
+    }
+  ],
+  "writable_layers": [
+    {
+      "container": "3xui_app",
+      "path": "/etc/fail2ban",
+      "artifact": "3xui-fail2ban-config.tar",
+      "sensitive": false
+    },
+    {
+      "container": "3xui_app",
+      "path": "/var/lib/fail2ban",
+      "artifact": "3xui-fail2ban-data.tar",
+      "sensitive": true
+    }
+  ],
+  "reference_artifacts": [
+    {
+      "artifacts": [
+        "ufw-config.tar",
+        "ufw-meta.txt",
+        "ufw-status.txt",
+        "ufw-numbered.txt",
+        "ufw-added.txt"
+      ],
+      "source": "/etc/ufw",
+      "note": "Reference only. Never extract into system paths, never execute saved commands, never apply to a target.",
+      "never_apply": true
+    }
+  ],
+  "metadata_artifacts": [
+    "images.json",
+    "backup.json"
+  ],
+  "pending_approval": [
+    {
+      "resource": "agent-relay",
+      "kind": "container",
+      "reason": "Owner reported an agent-relay service in the llmproxy project after the snapshot. Its container id, mounts, image origin and restart order are unverified; a backup claiming completeness is blocked until a fresh read-only inspect is reviewed and the manifest is approved."
+    }
+  ],
+  "exclusions": [
+    "telemt",
+    "docker_data_root",
+    "docker_images",
+    "certbot_runtime_lease",
+    "certbot_temporary_rules",
+    "provider_firewall_policy"
+  ],
+  "images": {
+    "archive_images": false,
+    "policy": "Images are never archived. Only registry references plus repo digests are recorded; restore pulls repository@sha256 digests and fails closed on an unavailable digest."
+  },
+  "certbot": {
+    "lineage": "kewlsub.duckdns.org",
+    "guard_path": "/usr/local/sbin/certbot-http01-guard",
+    "guard_enabled_path": "/etc/certbot-http01-guard.enabled",
+    "cleanup_service": "certbot-http01-cleanup.service",
+    "cleanup_timer": "certbot-http01-cleanup.timer",
+    "dropin": "/etc/systemd/system/certbot.service.d/http01-cleanup.conf",
+    "service_unit": "certbot.service",
+    "timer_unit": "certbot.timer",
+    "lease_path": "/var/lib/certbot-http01-guard/lease.json",
+    "artifact": "certbot-automation.tar",
+    "max_lease_seconds": 900,
+    "cleanup_interval_seconds": 30,
+    "permitted_hooks": [
+      "pre_hook",
+      "post_hook",
+      "renew_hook"
+    ],
+    "hook_fingerprints": {},
+    "renewal_hook_dirs": [
+      "/etc/letsencrypt/renewal-hooks/pre",
+      "/etc/letsencrypt/renewal-hooks/post",
+      "/etc/letsencrypt/renewal-hooks/deploy"
+    ]
+  },
+  "ufw": {
+    "reference_only": true,
+    "paths": [
+      "/etc/ufw",
+      "/etc/default/ufw"
+    ],
+    "never_apply": true
+  },
+  "trusted_files": []
+}
